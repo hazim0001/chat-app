@@ -1,30 +1,40 @@
-import logo from "./logo.svg";
 import "./App.css";
-import React, { useState, useEffect } from "react";
-import { ActionCableConsumer } from "react-actioncable-provider";
+import React, { useEffect } from "react";
 
-const App = () => {
-  const [rooms, setRooms] = useState([]);
+import { useSelector, useDispatch } from "react-redux";
+import { fetchRooms, addRoomWs } from "./redux/actions";
+
+const App = ({ cableApp }) => {
+  const dispatch = useDispatch();
+  console.log(cableApp);
 
   useEffect(() => {
-    fetch("http://localhost:3000/rooms")
-      .then((res) => res.json())
-      .then((roomsArr) => setRooms(roomsArr));
+    const handleReceivedRoom = (room) => {
+      dispatch(addRoomWs(room));
+    };
+    const createSubscription = () => {
+      cableApp.subscriptions.create(
+        { channel: "RoomsChannel" },
+        { received: (room) => handleReceivedRoom(room) }
+      );
+    };
+    dispatch(fetchRooms());
+    createSubscription();
+    return () => {
+      console.log("out");
+    };
+  }, [dispatch, cableApp.subscriptions]);
 
-    return () => {};
-  }, []);
+  const rooms = useSelector((state) => state.rooms);
 
-  const handleReceivedRoom = (response) => {
-    console.log(response);
-    return setRooms([...rooms, response.rooms]);
+  const mapRooms = () => {
+    return rooms.map((room, index) => <li key={index}>{room.name}</li>);
   };
 
   return (
     <div className="App">
-      <ActionCableConsumer
-        channel={{ channel: "RoomsChannel" }}
-        onReceived={handleReceivedRoom}
-      />
+      <h2>Rooms</h2>
+      <ul>{mapRooms()}</ul>
     </div>
   );
 };
