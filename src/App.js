@@ -1,42 +1,25 @@
 import "./App.css";
 import React, { useEffect } from "react";
-
 import { useSelector, useDispatch } from "react-redux";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { fetchRooms, addRoomWs } from "./redux/actions";
+import Rooms from "./pages/Rooms";
+import Room from "./pages/Room";
+import Home from "./pages/Home";
 
-const App = ({ cableApp }) => {
-  const dispatch = useDispatch();
-  console.log(cableApp);
-
-  useEffect(() => {
-    const handleReceivedRoom = (room) => {
-      dispatch(addRoomWs(room));
-    };
-    const createSubscription = () => {
-      cableApp.subscriptions.create(
-        { channel: "RoomsChannel" },
-        { received: (room) => handleReceivedRoom(room) }
-      );
-    };
-    dispatch(fetchRooms());
-    createSubscription();
-    return () => {
-      console.log("out");
-    };
-  }, [dispatch, cableApp.subscriptions]);
-
-  const rooms = useSelector((state) => state.rooms);
-
-  const mapRooms = () => {
-    return rooms.map((room, index) => <li key={index}>{room.name}</li>);
-  };
-
+const App = () => {
   return (
     <div className="App">
-      <h2>Rooms</h2>
-      <ul>{mapRooms()}</ul>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route path="/rooms/" element={<Rooms />} />
+          <Route path="/rooms/:id" element={<Room />} />
+        </Route>
+      </Routes>
     </div>
   );
 };
 
 export default App;
+// {/* <h2>Rooms</h2>
+// <ul>{mapRooms()}</ul> */}

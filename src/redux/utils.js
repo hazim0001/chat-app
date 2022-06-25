@@ -17,3 +17,6 @@ axios.defaults.headers.put["Content-Type"] = "application/json";
 export const apiFetchRooms = () => {
   return axios.get("/rooms");
 };
+export const apiFetchRoomMessages = (roomId) => {
+  return axios.get(`/rooms/${roomId}/messages`);
+};

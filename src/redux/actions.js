@@ -1,6 +1,6 @@
 import * as types from "./types";
 
-import { apiFetchRooms } from "./utils";
+import { apiFetchRooms, apiFetchRoomMessages } from "./utils";
 
 export const fetchRooms = () => (dispatch) => {
   apiFetchRooms()
@@ -24,4 +24,29 @@ const addRooms = (fetchedRooms) => ({
 const addRoom = (newRoom) => ({
   type: types.ADD_ROOM,
   payload: newRoom,
+});
+/// =>            Messages actions
+
+export const fetchMessages = (roomId) => (dispatch) => {
+  apiFetchRoomMessages(roomId)
+    .then((response) => {
+      dispatch(addMessages(response.data));
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+};
+
+export const addMessageWs = (newMessage) => (dispatch) => {
+  dispatch(addMessage(newMessage));
+};
+
+const addMessages = (fetchedMessages) => ({
+  type: types.FETCH_MESSAGES,
+  payload: fetchedMessages,
+});
+
+const addMessage = (newMessage) => ({
+  type: types.ADD_MESSAGE,
+  payload: newMessage,
 });
